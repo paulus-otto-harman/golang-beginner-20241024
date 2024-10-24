@@ -8,12 +8,20 @@ import (
 )
 
 type Order struct {
-	Jumlah    int    `json:"jumlah"`
-	CreatedAt string `json:"created_at"`
+	Id        int      `json:"id"`
+	Foods     []string `json:"foods"`
+	Jumlah    int      `json:"jumlah"`
+	CreatedAt string   `json:"created_at"`
 }
 
 func InitOrder(jumlah int) Order {
-	return Order{CreatedAt: time.DateTime, Jumlah: jumlah}
+	order := Order{Jumlah: jumlah, CreatedAt: time.Now().Format("2006-01-02 15:04:05")}
+	order.Id = order.GetId()
+	return order
+}
+
+func (order *Order) GetId() int {
+	return len((order.Retrieve()).([]Order)) + 1
 }
 
 func (order *Order) Create() {
@@ -49,4 +57,8 @@ func (order *Order) Retrieve() interface{} {
 	}
 
 	return orders
+}
+
+func (order *Order) AddFood(food string) {
+	order.Foods = append(order.Foods, food)
 }
