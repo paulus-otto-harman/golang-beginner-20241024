@@ -11,6 +11,7 @@ type Order struct {
 	Id        int      `json:"id"`
 	Foods     []string `json:"foods"`
 	Jumlah    int      `json:"jumlah"`
+	Status    string   `json:"status"`
 	CreatedAt string   `json:"created_at"`
 }
 
@@ -21,7 +22,8 @@ func InitOrder(jumlah int) Order {
 }
 
 func (order *Order) GetId() int {
-	return len((order.Retrieve()).([]Order)) + 1
+	orders := (order.Retrieve()).([]Order)
+	return orders[len(orders)-1].Id + 1
 }
 
 func (order *Order) Create() {
@@ -34,6 +36,28 @@ func (order *Order) Create() {
 
 	encoder := json.NewEncoder(file)
 	orders = append(orders, *order)
+
+	if err := encoder.Encode(orders); err != nil {
+		fmt.Println("Error encoding JSON:", err)
+	}
+}
+
+func (order *Order) Save() {
+	orders := (order.Retrieve()).([]Order)
+	file, err := os.Create("database/order.json")
+	if err != nil {
+		fmt.Println("Error creating file:", err)
+	}
+	defer file.Close()
+
+	encoder := json.NewEncoder(file)
+
+	for _, existingOrder := range orders {
+		if existingOrder.Id == order.Id {
+			existingOrder = *order
+			break
+		}
+	}
 
 	if err := encoder.Encode(orders); err != nil {
 		fmt.Println("Error encoding JSON:", err)
